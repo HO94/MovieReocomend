@@ -15,10 +15,12 @@ headers = {
     "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIzZDE3M2UyMzlmNzEwNmNlNTA4M2I1MGI4ZjU1M2U0NiIsInN1YiI6IjY1Njg4YjAzMDljMjRjMDExYmU3MmFlNSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.a_uICMVt4DygQzVWT-nQeDwYYQQxvxDM2Ho0_oe7MdQ"
 }
 
-url_dict = {'discover' : f'https://api.themoviedb.org/3/movie/now_playing?language=en-EN&page={pageNum}&region=KR',
-            'nowPlaying' : f'https://api.themoviedb.org/3/movie/now_playing?language=ko-KR&page={pageNum}&region=KR',
-            'popular' : f'https://api.themoviedb.org/3/movie/popular?language=ko-KR&page={pageNum}&region=KR',
-            'upComing' : f'https://api.themoviedb.org/3/movie/upcoming?language=ko-KR&page={pageNum}&region=KR'}
+url_dict = {
+    # 'discover' : f'https://api.themoviedb.org/3/movie/now_playing?language=en-EN&page={pageNum}&region=KR',
+    'nowPlaying' : f'https://api.themoviedb.org/3/movie/now_playing?language=ko-KR&page={pageNum}&region=KR',
+    'popular' : f'https://api.themoviedb.org/3/movie/popular?language=ko-KR&page={pageNum}&region=KR',
+    'upComing' : f'https://api.themoviedb.org/3/movie/upcoming?language=ko-KR&page={pageNum}&region=KR'
+    }
 
 
 # 기존 영화 목록
@@ -55,15 +57,18 @@ def _get_response_df(response):
     for idx in response['results']:
         sub_result = pd.DataFrame({'movie_id' : [idx['id']],
                     'overview' : [idx['overview']]})
-        
         total_result = pd.concat([total_result, sub_result], axis=0)
     return response_df
 
 def get_response(url, headers):
     response = requests.get(url, headers=headers)
     response_df = _get_response_df(response)
-
-    for pages in range(2, response['total_pages']+1):
+    if 'popular' in url:
+        # 1page : 20, total 1000
+        end_point = 50
+    else:
+        end_point = response['total_pages']+1
+    for pages in range(2, end_point):
         pageNum = pages
         response = requests.get(url_dict['popular'], headers=headers)
         response_df = pd.concat([response_df, _get_response_df(response)], axis=0)
@@ -71,7 +76,7 @@ def get_response(url, headers):
 
 if st.button('Recommend') :
     # 탭 생성 : 첫번째 탭의 이름은 Tab A 로, Tab B로 표시합니다. 
-    tab1, tab2, tab3= st.tabs(['Popular', 'Now Playing' , 'Upcoming'])
+    tab1, tab2, tab3, tab4= st.tabs(['Popular', 'Now Playing' , 'Upcoming', 'sample5000'])
 
     with tab1:
         url = url_dict['popular']
@@ -86,9 +91,13 @@ if st.button('Recommend') :
         result = get_recommendations(my_choice, indices, cosine_sim)
         st.text(result)
     with tab3:
-        url = url_dict['popular']
+        url = url_dict['upComing']
         response_df = get_response(url, headers)
         indices, cosine_sim = cal_cosine_sim(response_df)
+        result = get_recommendations(my_choice, indices, cosine_sim)
+        st.text(result)
+    with tab4:
+        indices, cosine_sim = cal_cosine_sim(movies)
         result = get_recommendations(my_choice, indices, cosine_sim)
         st.text(result)
 
