@@ -55,3 +55,6 @@ if st.button('Recommend') :
     indices, cosine_sim = cal_cosine_sim(df)
     result = get_recommendations(my_choice, indices, cosine_sim)
     st.text(result)
+
+
+values = st.slider('Please give me feedback', 0, 10, 5, 1 )
