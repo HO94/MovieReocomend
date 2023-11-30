@@ -51,8 +51,12 @@ def get_recommendations(title, indices, cosine_sim):
     return movies['title'].iloc[movie_indices]
 
 def _get_response_df(response):
-    response_df = pd.DataFrame({'movie_id' : [response['results'][0]['id']],
-                                'overview' : [response['results'][0]['overview']]})
+    total_result = pd.DataFrame()
+    for idx in response['results']:
+        sub_result = pd.DataFrame({'movie_id' : [idx['id']],
+                    'overview' : [idx['overview']]})
+        
+        total_result = pd.concat([total_result, sub_result], axis=0)
     return response_df
 
 def get_response(url, headers):
