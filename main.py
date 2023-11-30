@@ -17,9 +17,9 @@ headers = {
 
 url_dict = {
     # 'discover' : f'https://api.themoviedb.org/3/movie/now_playing?language=en-EN&page={pageNum}&region=KR',
-    'nowPlaying' : f'https://api.themoviedb.org/3/movie/now_playing?language=ko-KR&page={pageNum}&region=KR',
-    'popular' : f'https://api.themoviedb.org/3/movie/popular?language=ko-KR&page={pageNum}&region=KR',
-    'upComing' : f'https://api.themoviedb.org/3/movie/upcoming?language=ko-KR&page={pageNum}&region=KR'
+    'nowPlaying' : f'https://api.themoviedb.org/3/movie/now_playing?language=en-US&page={pageNum}&region=KR',
+    'popular' : f'https://api.themoviedb.org/3/movie/popular?language=en-US&page={pageNum}&region=KR',
+    'upComing' : f'https://api.themoviedb.org/3/movie/upcoming?language=en-US&page={pageNum}&region=KR'
     }
 
 
@@ -30,7 +30,10 @@ my_choice = st.selectbox('Please select a movie title', MOVIE_LIST)
 
 
 
-def cal_cosine_sim(df):
+def cal_cosine_sim(df, movies, my_choice):
+    choice_df = movies[movies['title'] == my_choice][['id', 'title', 'overview']]
+    choice_df.rename(columns = {'id' : 'movie_id'}, inplace=True)
+    df = pd.concat([df, choice_df], axis = 0).reset_index(drop=True)
     tfidf = TfidfVectorizer(stop_words='english')
     df['overview'] = df['overview'].fillna('')
     tfidf_matrix = tfidf.fit_transform(df['overview'])
@@ -66,6 +69,7 @@ def _get_response_df(response_result):
     total_result = pd.DataFrame()
     for idx in response_result['results']:
         sub_result = pd.DataFrame({'movie_id' : [idx['id']],
+                                   'title' : [idx['title']],
                                     'overview' : [idx['overview']]})
         total_result = pd.concat([total_result, sub_result], axis=0)
     return total_result
@@ -86,7 +90,7 @@ def get_response_df(url, response_result):
         response_result = response_result.replace('null', 'None')
         response_result = eval(response_result)
         response_df = pd.concat([response_df, _get_response_df(response_result)], axis=0)
-    return response_df
+    return response_df.reset_index(drop=True)
 
 if st.button('Recommend') :
     # 탭 생성 : 첫번째 탭의 이름은 Tab A 로, Tab B로 표시합니다. 
