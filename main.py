@@ -52,13 +52,6 @@ def get_recommendations(title, indices, cosine_sim):
     # Return the top 10 most similar movies
     return movies['title'].iloc[movie_indices]
 
-def _get_response_df(response):
-    total_result = pd.DataFrame()
-    for idx in response['results']:
-        sub_result = pd.DataFrame({'movie_id' : [idx['id']],
-                    'overview' : [idx['overview']]})
-        total_result = pd.concat([total_result, sub_result], axis=0)
-    return total_result
 
 def get_response(url, headers):
     response = requests.get(url, headers=headers)
@@ -66,16 +59,33 @@ def get_response(url, headers):
     response_result = response_result.replace('false', 'False')
     response_result = response_result.replace('null', 'None')
     response_result = eval(response_result)
+    return response_result
+
+
+def _get_response_df(response_result):
+    total_result = pd.DataFrame()
+    for idx in response_result['results']:
+        sub_result = pd.DataFrame({'movie_id' : [idx['id']],
+                                    'overview' : [idx['overview']]})
+        total_result = pd.concat([total_result, sub_result], axis=0)
+    return total_result
+
+
+def get_response_df(url, response_result):
     response_df = _get_response_df(response_result)
     if 'popular' in url:
         # 1page : 20, total 1000
         end_point = 50
     else:
-        end_point = response['total_pages']+1
+        end_point = response_result['total_pages']+1
     for pages in range(2, end_point):
         pageNum = pages
-        response = requests.get(url_dict['popular'], headers=headers)
-        response_df = pd.concat([response_df, _get_response_df(response)], axis=0)
+        response = requests.get(url, headers=headers)
+        response_result = response.text
+        response_result = response_result.replace('false', 'False')
+        response_result = response_result.replace('null', 'None')
+        response_result = eval(response_result)
+        response_df = pd.concat([response_df, _get_response_df(response_result)], axis=0)
     return response_df
 
 if st.button('Recommend') :
@@ -84,19 +94,22 @@ if st.button('Recommend') :
 
     with tab1:
         url = url_dict['popular']
-        response_df = get_response(url, headers)
+        response = get_response(url, headers)
+        response_df = get_response_df(url, response)
         indices, cosine_sim = cal_cosine_sim(response_df)
         result = get_recommendations(my_choice, indices, cosine_sim)
         st.text(result)
     with tab2:
         url = url_dict['nowPlaying']
-        response_df = get_response(url, headers)
+        response = get_response(url, headers)
+        response_df = get_response_df(url, response)
         indices, cosine_sim = cal_cosine_sim(response_df)
         result = get_recommendations(my_choice, indices, cosine_sim)
         st.text(result)
     with tab3:
         url = url_dict['upComing']
-        response_df = get_response(url, headers)
+        response = get_response(url, headers)
+        response_df = get_response_df(url, response)
         indices, cosine_sim = cal_cosine_sim(response_df)
         result = get_recommendations(my_choice, indices, cosine_sim)
         st.text(result)
