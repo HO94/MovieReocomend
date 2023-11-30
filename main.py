@@ -30,10 +30,12 @@ my_choice = st.selectbox('Please select a movie title', MOVIE_LIST)
 
 
 
-def cal_cosine_sim(df, movies, my_choice):
-    choice_df = movies[movies['title'] == my_choice][['id', 'title', 'overview']]
-    choice_df.rename(columns = {'id' : 'movie_id'}, inplace=True)
-    df = pd.concat([df, choice_df], axis = 0).reset_index(drop=True)
+def cal_cosine_sim(df, sample=False):
+    if sample == False:
+        choice_df = movies[movies['title'] == my_choice][['id', 'title', 'overview']]
+        choice_df.rename(columns = {'id' : 'movie_id'}, inplace=True)
+        df = pd.concat([df, choice_df], axis = 0).reset_index(drop=True)
+    
     tfidf = TfidfVectorizer(stop_words='english')
     df['overview'] = df['overview'].fillna('')
     tfidf_matrix = tfidf.fit_transform(df['overview'])
@@ -100,25 +102,25 @@ if st.button('Recommend') :
         url = url_dict['popular']
         response = get_response(url, headers)
         response_df = get_response_df(url, response)
-        indices, cosine_sim = cal_cosine_sim(response_df)
+        indices, cosine_sim = cal_cosine_sim(response_df, sample=False)
         result = get_recommendations(my_choice, indices, cosine_sim)
         st.text(result)
     with tab2:
         url = url_dict['nowPlaying']
         response = get_response(url, headers)
         response_df = get_response_df(url, response)
-        indices, cosine_sim = cal_cosine_sim(response_df)
+        indices, cosine_sim = cal_cosine_sim(response_df, sample=False)
         result = get_recommendations(my_choice, indices, cosine_sim)
         st.text(result)
     with tab3:
         url = url_dict['upComing']
         response = get_response(url, headers)
         response_df = get_response_df(url, response)
-        indices, cosine_sim = cal_cosine_sim(response_df)
+        indices, cosine_sim = cal_cosine_sim(response_df, sample=False)
         result = get_recommendations(my_choice, indices, cosine_sim)
         st.text(result)
     with tab4:
-        indices, cosine_sim = cal_cosine_sim(movies)
+        indices, cosine_sim = cal_cosine_sim(movies, sample=True)
         result = get_recommendations(my_choice, indices, cosine_sim)
         st.text(result)
 
