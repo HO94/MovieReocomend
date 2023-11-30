@@ -99,26 +99,26 @@ if st.button('Recommend') :
     tab1, tab2, tab3, tab4= st.tabs(['Popular', 'Now Playing' , 'Upcoming', 'sample5000'])
 
     with tab1:
-        url = url_dict['popular']
-        response = get_response(url, headers)
-        response_df = get_response_df(url, response)
+        popular_url = url_dict['popular']
+        response = get_response(popular_url, headers)
+        response_df = get_response_df(popular_url, response)
         indices, cosine_sim = cal_cosine_sim(response_df, sample=False)
-        result = get_recommendations(my_choice, indices, cosine_sim)
-        st.text(result)
+        popular_result = get_recommendations(my_choice, indices, cosine_sim)
+        st.text(popular_result)
     with tab2:
-        url = url_dict['nowPlaying']
-        response = get_response(url, headers)
-        response_df = get_response_df(url, response)
+        now_url = url_dict['nowPlaying']
+        response = get_response(now_url, headers)
+        response_df = get_response_df(now_url, response)
         indices, cosine_sim = cal_cosine_sim(response_df, sample=False)
-        result = get_recommendations(my_choice, indices, cosine_sim)
-        st.text(result)
+        now_result = get_recommendations(my_choice, indices, cosine_sim)
+        st.text(now_result)
     with tab3:
-        url = url_dict['upComing']
-        response = get_response(url, headers)
-        response_df = get_response_df(url, response)
+        come_url = url_dict['upComing']
+        response = get_response(come_url, headers)
+        response_df = get_response_df(come_url, response)
         indices, cosine_sim = cal_cosine_sim(response_df, sample=False)
-        result = get_recommendations(my_choice, indices, cosine_sim)
-        st.text(result)
+        come_result = get_recommendations(my_choice, indices, cosine_sim)
+        st.text(come_result)
     with tab4:
         indices, cosine_sim = cal_cosine_sim(movies, sample=True)
         result = get_recommendations(my_choice, indices, cosine_sim)
