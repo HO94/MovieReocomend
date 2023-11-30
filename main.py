@@ -37,7 +37,7 @@ def cal_cosine_sim(df):
     indices = pd.Series(df.index, index=df['title']).drop_duplicates()
     return indices, cosine_sim
 
-def get_recommendations(title, indices, cosine_sim=cosine_sim):
+def get_recommendations(title, indices, cosine_sim):
     # Get the index of the movie that matches the title
     idx = indices[title]
     # Get the pairwsie similarity scores of all movies with that movie
