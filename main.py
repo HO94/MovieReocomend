@@ -58,13 +58,14 @@ def _get_response_df(response):
         sub_result = pd.DataFrame({'movie_id' : [idx['id']],
                     'overview' : [idx['overview']]})
         total_result = pd.concat([total_result, sub_result], axis=0)
-    return response_df
+    return total_result
 
 def get_response(url, headers):
     response = requests.get(url, headers=headers)
     response_result = response.text
     response_result = response_result.replace('false', 'False')
     response_result = response_result.replace('null', 'None')
+    response_result = eval(response_result)
     response_df = _get_response_df(response_result)
     if 'popular' in url:
         # 1page : 20, total 1000
