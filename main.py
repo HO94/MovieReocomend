@@ -12,9 +12,12 @@ cred = pd.read_csv('./data/tmdb_5000_credits.csv')
 movies = pd.read_csv('./data/tmdb_5000_movies.csv')
 cred.columns = ['id','tittle','cast','crew']
 df= movies.merge(cred,on='id')
+m = df['vote_count'].quantile(0.9)
+C = df['vote_average'].mean()
 
 MOVIE_LIST = movies['title']
 my_choice = st.selectbox('Please select a movie title', MOVIE_LIST)
+
 
 def _weighted_rating(x, m=m, C=C):
     v = x['vote_count']
