@@ -62,7 +62,7 @@ def _get_response_df(response):
 
 def get_response(url, headers):
     response = requests.get(url, headers=headers)
-    response_df = _get_response_df(response)
+    response_df = _get_response_df(response.text)
     if 'popular' in url:
         # 1page : 20, total 1000
         end_point = 50
