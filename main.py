@@ -1,35 +1,34 @@
+# D:\국민대\인공지능응용3\movie_backup
 # main.py
 import streamlit as st
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
-
+import requests
 
 st.title('Movie Recommendation')
 st.text('국민대학교 인공지능응용 5조')
 
-cred = pd.read_csv('./data/tmdb_5000_credits.csv')
-movies = pd.read_csv('./data/tmdb_5000_movies.csv')
-cred.columns = ['id','tittle','cast','crew']
-df= movies.merge(cred,on='id')
-m = df['vote_count'].quantile(0.9)
-C = df['vote_average'].mean()
+pageNum= 1
+headers = {
+    "accept": "application/json",
+    "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIzZDE3M2UyMzlmNzEwNmNlNTA4M2I1MGI4ZjU1M2U0NiIsInN1YiI6IjY1Njg4YjAzMDljMjRjMDExYmU3MmFlNSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.a_uICMVt4DygQzVWT-nQeDwYYQQxvxDM2Ho0_oe7MdQ"
+}
 
+url_dict = {'discover' : f'https://api.themoviedb.org/3/movie/now_playing?language=en-EN&page={pageNum}&region=KR',
+            'nowPlaying' : f'https://api.themoviedb.org/3/movie/now_playing?language=ko-KR&page={pageNum}&region=KR',
+            'popular' : f'https://api.themoviedb.org/3/movie/popular?language=ko-KR&page={pageNum}&region=KR',
+            'upComing' : f'https://api.themoviedb.org/3/movie/upcoming?language=ko-KR&page={pageNum}&region=KR'}
+
+
+# 기존 영화 목록
+movies = pd.read_csv('./data/tmdb_5000_movies.csv')
 MOVIE_LIST = movies['title']
 my_choice = st.selectbox('Please select a movie title', MOVIE_LIST)
 
 
-def _weighted_rating(x, m=m, C=C):
-    v = x['vote_count']
-    R = x['vote_average']
-    return (v/(v+m) * R) + (m/(m+v) * C)
 
 def cal_cosine_sim(df):
-    C = df['vote_average'].mean()
-    m = df['vote_count'].quantile(0.9)
-    q_movies = df.copy().loc[df['vote_count'] >= m]
-    q_movies['score'] = q_movies.apply(_weighted_rating, axis=1)
-    q_movies = q_movies.sort_values('score', ascending=False)
     tfidf = TfidfVectorizer(stop_words='english')
     df['overview'] = df['overview'].fillna('')
     tfidf_matrix = tfidf.fit_transform(df['overview'])
@@ -49,12 +48,45 @@ def get_recommendations(title, indices, cosine_sim):
     # Get the movie indices
     movie_indices = [i[0] for i in sim_scores]
     # Return the top 10 most similar movies
-    return df['title'].iloc[movie_indices]
+    return movies['title'].iloc[movie_indices]
+
+def _get_response_df(response):
+    response_df = pd.DataFrame({'movie_id' : [response['results'][0]['id']],
+                                'overview' : [response['results'][0]['overview']]})
+    return response_df
+
+def get_response(url, headers):
+    response = requests.get(url, headers=headers)
+    response_df = _get_response_df(response)
+
+    for pages in range(2, response['total_pages']+1):
+        pageNum = pages
+        response = requests.get(url_dict['popular'], headers=headers)
+        response_df = pd.concat([response_df, _get_response_df(response)], axis=0)
+    return response_df
 
 if st.button('Recommend') :
-    indices, cosine_sim = cal_cosine_sim(df)
-    result = get_recommendations(my_choice, indices, cosine_sim)
-    st.text(result)
+    # 탭 생성 : 첫번째 탭의 이름은 Tab A 로, Tab B로 표시합니다. 
+    tab1, tab2, tab3= st.tabs(['Popular', 'Now Playing' , 'Upcoming'])
+
+    with tab1:
+        url = url_dict['popular']
+        response_df = get_response(url, headers)
+        indices, cosine_sim = cal_cosine_sim(response_df)
+        result = get_recommendations(my_choice, indices, cosine_sim)
+        st.text(result)
+    with tab2:
+        url = url_dict['nowPlaying']
+        response_df = get_response(url, headers)
+        indices, cosine_sim = cal_cosine_sim(response_df)
+        result = get_recommendations(my_choice, indices, cosine_sim)
+        st.text(result)
+    with tab3:
+        url = url_dict['popular']
+        response_df = get_response(url, headers)
+        indices, cosine_sim = cal_cosine_sim(response_df)
+        result = get_recommendations(my_choice, indices, cosine_sim)
+        st.text(result)
 
 
 values = st.slider('Please give me feedback', 0, 10, 5, 1 )
