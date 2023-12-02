@@ -223,7 +223,7 @@ if st.button('Recommend') :
         result = get_recommendations(movies, my_choice, indices, cosine_sim)
 
         poster_url = []
-        id_list = result['movie_id'].tolist()
+        id_list = result['id'].tolist()
 
         for movie_id in id_list[:5]:
             # print(movie_id)
