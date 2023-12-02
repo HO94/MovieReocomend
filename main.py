@@ -127,23 +127,22 @@ if st.button('Recommend') :
             tmp = eval(tmp)
             poster_url.append(p_url + tmp['posters'][0]['file_path'])
 
-
         col1, col2, col3, col4, col5 = st.columns(5)
         with col1:
             st.image(poster_url[0])
-            st.text(popular_result['title'])
+            st.text(popular_result.iloc[0]['title'])
         with col2:
             st.image(poster_url[1])
-            st.text(popular_result['title'])
+            st.text(popular_result.iloc[1]['title'])
         with col3:
             st.image(poster_url[2])
-            st.text(popular_result['title'])
+            st.text(popular_result.iloc[2]['title'])
         with col4:
             st.image(poster_url[3])
-            st.text(popular_result['title'])
+            st.text(popular_result.iloc[3]['title'])
         with col5:
             st.image(poster_url[4])
-            st.text(popular_result['title'])
+            st.text(popular_result.iloc[4]['title'])
 
     with tab2:
         now_url = url_dict['nowPlaying']
@@ -151,21 +150,35 @@ if st.button('Recommend') :
         indices_nowPlaying, cosine_sim_nowPlaying = cal_cosine_sim(response_df_nowPlaying, movies, my_choice)
         now_result = get_recommendations(response_df_nowPlaying, my_choice, indices_nowPlaying, cosine_sim_nowPlaying)
 
+        poster_url = []
+        id_list = now_result['movie_id'].tolist()
+
+        for movie_id in id_list[:5]:
+            # print(movie_id)
+            url = f'https://api.themoviedb.org/3/movie/{movie_id}/images?include_image_language=ko'
+            # print(url)
+            response = requests.get(url, headers=headers)
+
+            tmp = response.text
+            tmp = tmp.replace('null', 'None')
+            tmp = eval(tmp)
+            poster_url.append(p_url + tmp['posters'][0]['file_path'])
+
         col1, col2, col3, col4, col5 = st.columns(5)
         with col1:
-            st.image('https://image.tmdb.org/t/p/original//aljO2O1SP21GziM2Gc34jnSjac3.jpg')
+            st.image(poster_url[0])
             st.text(now_result.iloc[0]['title'])
         with col2:
-            st.image('https://image.tmdb.org/t/p/original//aljO2O1SP21GziM2Gc34jnSjac3.jpg')
+            st.image(poster_url[1])
             st.text(now_result.iloc[1]['title'])
         with col3:
-            st.image('https://image.tmdb.org/t/p/original//aljO2O1SP21GziM2Gc34jnSjac3.jpg')
+            st.image(poster_url[2])
             st.text(now_result.iloc[2]['title'])
         with col4:
-            st.image('https://image.tmdb.org/t/p/original//aljO2O1SP21GziM2Gc34jnSjac3.jpg')
+            st.image(poster_url[3])
             st.text(now_result.iloc[3]['title'])
         with col5:
-            st.image('https://image.tmdb.org/t/p/original//aljO2O1SP21GziM2Gc34jnSjac3.jpg')
+            st.image(poster_url[4])
             st.text(now_result.iloc[4]['title'])
 
     with tab3:
@@ -174,43 +187,71 @@ if st.button('Recommend') :
         indices_upComing, cosine_simupComing = cal_cosine_sim(response_df_upComing, movies, my_choice)
         come_result = get_recommendations(response_df_upComing, my_choice, indices_upComing, cosine_simupComing)
 
+        poster_url = []
+        id_list = come_result['movie_id'].tolist()
+
+        for movie_id in id_list[:5]:
+            # print(movie_id)
+            url = f'https://api.themoviedb.org/3/movie/{movie_id}/images?include_image_language=ko'
+            # print(url)
+            response = requests.get(url, headers=headers)
+
+            tmp = response.text
+            tmp = tmp.replace('null', 'None')
+            tmp = eval(tmp)
+            poster_url.append(p_url + tmp['posters'][0]['file_path'])
+
         col1, col2, col3, col4, col5 = st.columns(5)
         with col1:
-            st.image('https://image.tmdb.org/t/p/original//aljO2O1SP21GziM2Gc34jnSjac3.jpg')
-            st.text(come_result['title'])
+            st.image(poster_url[0])
+            st.text(come_result.iloc[0]['title'])
         with col2:
-            st.image('https://image.tmdb.org/t/p/original//aljO2O1SP21GziM2Gc34jnSjac3.jpg')
-            st.text(come_result['title'])
+            st.image(poster_url[1])
+            st.text(come_result.iloc[1]['title'])
         with col3:
-            st.image('https://image.tmdb.org/t/p/original//aljO2O1SP21GziM2Gc34jnSjac3.jpg')
-            st.text(come_result['title'])
+            st.image(poster_url[2])
+            st.text(come_result.iloc[2]['title'])
         with col4:
-            st.image('https://image.tmdb.org/t/p/original//aljO2O1SP21GziM2Gc34jnSjac3.jpg')
-            st.text(come_result['title'])
+            st.image(poster_url[3])
+            st.text(come_result.iloc[3]['title'])
         with col5:
-            st.image('https://image.tmdb.org/t/p/original//aljO2O1SP21GziM2Gc34jnSjac3.jpg')
-            st.text(come_result['title'])
+            st.image(poster_url[4])
+            st.text(come_result.iloc[4]['title'])
 
     with tab4:
         indices, cosine_sim = cal_cosine_sim(movies, movies, my_choice, sample=True)
         result = get_recommendations(movies, my_choice, indices, cosine_sim)
 
+        poster_url = []
+        id_list = result['movie_id'].tolist()
+
+        for movie_id in id_list[:5]:
+            # print(movie_id)
+            url = f'https://api.themoviedb.org/3/movie/{movie_id}/images?include_image_language=ko'
+            # print(url)
+            response = requests.get(url, headers=headers)
+
+            tmp = response.text
+            tmp = tmp.replace('null', 'None')
+            tmp = eval(tmp)
+            poster_url.append(p_url + tmp['posters'][0]['file_path'])
+
         col1, col2, col3, col4, col5 = st.columns(5)
         with col1:
-            st.image('https://image.tmdb.org/t/p/original//aljO2O1SP21GziM2Gc34jnSjac3.jpg')
+            st.image(poster_url[0])
             st.text(result.iloc[0]['title'])
         with col2:
-            st.image('https://image.tmdb.org/t/p/original//aljO2O1SP21GziM2Gc34jnSjac3.jpg')
-            st.text(result['title'])
+            st.image(poster_url[1])
+            st.text(result.iloc[1]['title'])
         with col3:
-            st.image('https://image.tmdb.org/t/p/original//aljO2O1SP21GziM2Gc34jnSjac3.jpg')
-            st.text(result['title'])
+            st.image(poster_url[2])
+            st.text(result.iloc[2]['title'])
         with col4:
-            st.image('https://image.tmdb.org/t/p/original//aljO2O1SP21GziM2Gc34jnSjac3.jpg')
-            st.text(result['title'])
+            st.image(poster_url[3])
+            st.text(result.iloc[3]['title'])
         with col5:
-            st.image('https://image.tmdb.org/t/p/original//aljO2O1SP21GziM2Gc34jnSjac3.jpg')
-            st.text(result['title'])
+            st.image(poster_url[4])
+            st.text(result.iloc[4]['title'])
 
 
 values = st.slider('Please give me feedback', 0, 10, 5, 1 )
