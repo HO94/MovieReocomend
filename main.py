@@ -70,13 +70,13 @@ def _get_response(url, headers):
 
 
 def _get_df(response_dict):
-    total_result = pd.DataFrame()
+    result = pd.DataFrame()
     for idx in response_dict['results']:
         sub_result = pd.DataFrame({'movie_id' : [idx['id']],
                                    'title' : [idx['title']],
                                     'overview' : [idx['overview']]})
-        total_result = pd.concat([total_result, sub_result], axis=0)
-    return total_result
+        result = pd.concat([result, sub_result], axis=0)
+    return result
 
 
 def get_response_df(url, target, headers):
@@ -110,23 +110,23 @@ if st.button('Recommend') :
     with tab1:
         popular_url = url_dict['popular']
         response_df_popular = get_response_df(popular_url, 'popular', headers)
-        indices_popular, cosine_sim_popular = cal_cosine_sim(response_df_popular, movies, my_choice, sample=False)
+        indices_popular, cosine_sim_popular = cal_cosine_sim(response_df_popular, movies, my_choice)
         popular_result = get_recommendations(response_df_popular, my_choice, indices_popular, cosine_sim_popular)
         st.text(popular_result)
     with tab2:
         now_url = url_dict['nowPlaying']
         response_df_nowPlaying = get_response_df(now_url, 'nowPlaying', headers)
-        indices_nowPlaying, cosine_sim_nowPlaying = cal_cosine_sim(response_df_nowPlaying, movies, my_choice, sample=False)
+        indices_nowPlaying, cosine_sim_nowPlaying = cal_cosine_sim(response_df_nowPlaying, movies, my_choice)
         now_result = get_recommendations(response_df_nowPlaying, my_choice, indices_nowPlaying, cosine_sim_nowPlaying)
         st.text(now_result)
     with tab3:
         come_url = url_dict['upComing']
         response_df_upComing = get_response_df(come_url, 'upComing', headers)
-        indices_upComing, cosine_simupComing = cal_cosine_sim(response_df_upComing, movies, my_choice, sample=False)
+        indices_upComing, cosine_simupComing = cal_cosine_sim(response_df_upComing, movies, my_choice)
         come_result = get_recommendations(response_df_upComing, my_choice, indices_upComing, cosine_simupComing)
         st.text(come_result)
     with tab4:
-        indices, cosine_sim = cal_cosine_sim(movies, sample=True)
+        indices, cosine_sim = cal_cosine_sim(movies, movies, my_choice, sample=True)
         result = get_recommendations(movies, my_choice, indices, cosine_sim)
         st.text(result)
 
