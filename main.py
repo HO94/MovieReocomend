@@ -57,7 +57,7 @@ def get_recommendations(response_df, title, indices, cosine_sim):
     # Get the movie indices
     movie_indices = [i[0] for i in sim_scores]
     # Return the top 10 most similar movies
-    return response_df['title'].iloc[movie_indices]
+    return response_df.iloc[movie_indices]
 
 
 def _get_response(url, headers):
