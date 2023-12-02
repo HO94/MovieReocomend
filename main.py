@@ -47,6 +47,7 @@ def cal_cosine_sim(response_df, movies, my_choice, sample=False):
 def get_recommendations(response_df, title, indices, cosine_sim):
     # Get the index of the movie that matches the title
     idx = indices[title]
+    st.text(idx)
     # Get the pairwsie similarity scores of all movies with that movie
     sim_scores = list(enumerate(cosine_sim[idx]))
     st.text(sim_scores)
