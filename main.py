@@ -104,9 +104,12 @@ if st.button('Recommend') :
 
     with tab1:
         popular_url = url_dict['popular']
-        st.text(popular_url)
+        
         response_df = get_response_df(popular_url, 'popular', headers)
+        st.text(response_df)
         indices, cosine_sim = cal_cosine_sim(response_df, sample=False)
+        st.text(indices)
+        st.text(cosine_sim)
         popular_result = get_recommendations(response_df, my_choice, indices, cosine_sim)
         st.text(popular_result)
     with tab2:
