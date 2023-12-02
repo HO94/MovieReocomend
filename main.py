@@ -112,29 +112,89 @@ if st.button('Recommend') :
         indices_popular, cosine_sim_popular = cal_cosine_sim(response_df_popular, movies, my_choice)
         popular_result = get_recommendations(response_df_popular, my_choice, indices_popular, cosine_sim_popular)
         
-        col1, col2 = st.columns(2)
+        col1, col2, col3, col4, col5 = st.columns(5)
         with col1:
-            st.text(popular_result['title'])
             st.image('https://image.tmdb.org/t/p/original//aljO2O1SP21GziM2Gc34jnSjac3.jpg')
+            st.text(popular_result['title'])
         with col2:
-            st.text(popular_result['title'])
             st.image('https://image.tmdb.org/t/p/original//aljO2O1SP21GziM2Gc34jnSjac3.jpg')
+            st.text(popular_result['title'])
+        with col3:
+            st.image('https://image.tmdb.org/t/p/original//aljO2O1SP21GziM2Gc34jnSjac3.jpg')
+            st.text(popular_result['title'])
+        with col4:
+            st.image('https://image.tmdb.org/t/p/original//aljO2O1SP21GziM2Gc34jnSjac3.jpg')
+            st.text(popular_result['title'])
+        with col5:
+            st.image('https://image.tmdb.org/t/p/original//aljO2O1SP21GziM2Gc34jnSjac3.jpg')
+            st.text(popular_result['title'])
+
     with tab2:
         now_url = url_dict['nowPlaying']
         response_df_nowPlaying = get_response_df(now_url, 'nowPlaying', headers)
         indices_nowPlaying, cosine_sim_nowPlaying = cal_cosine_sim(response_df_nowPlaying, movies, my_choice)
         now_result = get_recommendations(response_df_nowPlaying, my_choice, indices_nowPlaying, cosine_sim_nowPlaying)
-        st.text(now_result['title'])
+
+        col1, col2, col3, col4, col5 = st.columns(5)
+        with col1:
+            st.image('https://image.tmdb.org/t/p/original//aljO2O1SP21GziM2Gc34jnSjac3.jpg')
+            st.text(now_result.iloc[0]['title'])
+        with col2:
+            st.image('https://image.tmdb.org/t/p/original//aljO2O1SP21GziM2Gc34jnSjac3.jpg')
+            st.text(now_result.iloc[1]['title'])
+        with col3:
+            st.image('https://image.tmdb.org/t/p/original//aljO2O1SP21GziM2Gc34jnSjac3.jpg')
+            st.text(now_result.iloc[2]['title'])
+        with col4:
+            st.image('https://image.tmdb.org/t/p/original//aljO2O1SP21GziM2Gc34jnSjac3.jpg')
+            st.text(now_result.iloc[3]['title'])
+        with col5:
+            st.image('https://image.tmdb.org/t/p/original//aljO2O1SP21GziM2Gc34jnSjac3.jpg')
+            st.text(now_result.iloc[4]['title'])
+
     with tab3:
         come_url = url_dict['upComing']
         response_df_upComing = get_response_df(come_url, 'upComing', headers)
         indices_upComing, cosine_simupComing = cal_cosine_sim(response_df_upComing, movies, my_choice)
         come_result = get_recommendations(response_df_upComing, my_choice, indices_upComing, cosine_simupComing)
-        st.text(come_result['title'])
+
+        col1, col2, col3, col4, col5 = st.columns(5)
+        with col1:
+            st.image('https://image.tmdb.org/t/p/original//aljO2O1SP21GziM2Gc34jnSjac3.jpg')
+            st.text(come_result['title'])
+        with col2:
+            st.image('https://image.tmdb.org/t/p/original//aljO2O1SP21GziM2Gc34jnSjac3.jpg')
+            st.text(come_result['title'])
+        with col3:
+            st.image('https://image.tmdb.org/t/p/original//aljO2O1SP21GziM2Gc34jnSjac3.jpg')
+            st.text(come_result['title'])
+        with col4:
+            st.image('https://image.tmdb.org/t/p/original//aljO2O1SP21GziM2Gc34jnSjac3.jpg')
+            st.text(come_result['title'])
+        with col5:
+            st.image('https://image.tmdb.org/t/p/original//aljO2O1SP21GziM2Gc34jnSjac3.jpg')
+            st.text(come_result['title'])
+
     with tab4:
         indices, cosine_sim = cal_cosine_sim(movies, movies, my_choice, sample=True)
         result = get_recommendations(movies, my_choice, indices, cosine_sim)
-        st.text(result['title'])
+
+        col1, col2, col3, col4, col5 = st.columns(5)
+        with col1:
+            st.image('https://image.tmdb.org/t/p/original//aljO2O1SP21GziM2Gc34jnSjac3.jpg')
+            st.text(result.iloc[0]['title'])
+        with col2:
+            st.image('https://image.tmdb.org/t/p/original//aljO2O1SP21GziM2Gc34jnSjac3.jpg')
+            st.text(result['title'])
+        with col3:
+            st.image('https://image.tmdb.org/t/p/original//aljO2O1SP21GziM2Gc34jnSjac3.jpg')
+            st.text(result['title'])
+        with col4:
+            st.image('https://image.tmdb.org/t/p/original//aljO2O1SP21GziM2Gc34jnSjac3.jpg')
+            st.text(result['title'])
+        with col5:
+            st.image('https://image.tmdb.org/t/p/original//aljO2O1SP21GziM2Gc34jnSjac3.jpg')
+            st.text(result['title'])
 
 
 values = st.slider('Please give me feedback', 0, 10, 5, 1 )
