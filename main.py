@@ -49,6 +49,7 @@ def get_recommendations(response_df, title, indices, cosine_sim):
     idx = indices[title]
     # Get the pairwsie similarity scores of all movies with that movie
     sim_scores = list(enumerate(cosine_sim[idx]))
+    st.text(sim_scores)
     # Sort the movies based on the similarity scores
     sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
     # Get the scores of the 10 most similar movies
