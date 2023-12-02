@@ -32,10 +32,11 @@ my_choice = st.selectbox('Please select a movie title', MOVIE_LIST)
 
 def cal_cosine_sim(response_df, movies, my_choice, sample=False):
     if sample == False:
-        choice_df = movies[movies['title'] == my_choice][['id', 'title', 'overview']]
-        choice_df.rename(columns = {'id' : 'movie_id'}, inplace=True)
-        response_df = pd.concat([response_df, choice_df], axis = 0).reset_index(drop=True)
-    
+        if response_df[response_df['title'] == my_choice].shape[0] == 0:
+            choice_df = movies[movies['title'] == my_choice][['id', 'title', 'overview']]
+            choice_df.rename(columns = {'id' : 'movie_id'}, inplace=True)
+            response_df = pd.concat([response_df, choice_df], axis = 0).reset_index(drop=True)
+        
     tfidf = TfidfVectorizer(stop_words='english')
     response_df['overview'] = response_df['overview'].fillna('')
     tfidf_matrix = tfidf.fit_transform(response_df['overview'])
@@ -50,7 +51,6 @@ def get_recommendations(response_df, title, indices, cosine_sim):
     st.text(idx)
     # Get the pairwsie similarity scores of all movies with that movie
     sim_scores = list(enumerate(cosine_sim[idx]))
-    st.text(sim_scores)
     # Sort the movies based on the similarity scores
     sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
     # Get the scores of the 10 most similar movies
