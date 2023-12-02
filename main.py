@@ -49,7 +49,6 @@ def get_recommendations(response_df, title, indices, cosine_sim):
     idx = indices[title]
     # Get the pairwsie similarity scores of all movies with that movie
     sim_scores = list(enumerate(cosine_sim[idx]))
-    st.text(sim_scores)
     # Sort the movies based on the similarity scores
     sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
     # Get the scores of the 10 most similar movies
@@ -110,6 +109,7 @@ if st.button('Recommend') :
         popular_url = url_dict['popular']
         response_df_popular = get_response_df(popular_url, 'popular', headers)
         indices_popular, cosine_sim_popular = cal_cosine_sim(response_df_popular, movies, my_choice, sample=False)
+        st.text(cosine_sim_popular)
         popular_result = get_recommendations(response_df_popular, my_choice, indices_popular, cosine_sim_popular)
         st.text(popular_result)
     with tab2:
