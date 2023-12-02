@@ -114,10 +114,10 @@ if st.button('Recommend') :
         
         col1, col2 = st.columns(2)
         with col1:
-            st.text(popular_result['title'][0])
+            st.text(popular_result['title'].iloc[0])
             st.image('https://image.tmdb.org/t/p/original//aljO2O1SP21GziM2Gc34jnSjac3.jpg')
         with col2:
-            st.text(popular_result['title'][1])
+            st.text(popular_result['title'].iloc[1])
             st.image('https://image.tmdb.org/t/p/original//aljO2O1SP21GziM2Gc34jnSjac3.jpg')
     with tab2:
         now_url = url_dict['nowPlaying']
