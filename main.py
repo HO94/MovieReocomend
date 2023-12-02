@@ -101,6 +101,7 @@ def get_response_df(url, target, headers):
     return total_reulst.reset_index(drop=True)
 
 
+p_url = 'https://image.tmdb.org/t/p/original/'
 
 if st.button('Recommend') :
     # 탭 생성 : 첫번째 탭의 이름은 Tab A 로, Tab B로 표시합니다. 
@@ -112,21 +113,36 @@ if st.button('Recommend') :
         indices_popular, cosine_sim_popular = cal_cosine_sim(response_df_popular, movies, my_choice)
         popular_result = get_recommendations(response_df_popular, my_choice, indices_popular, cosine_sim_popular)
         
+        poster_url = []
+        id_list = popular_result['movie_id'].tolist()
+
+        for movie_id in id_list[:5]:
+            # print(movie_id)
+            url = f'https://api.themoviedb.org/3/movie/{movie_id}/images?include_image_language=ko'
+            # print(url)
+            response = requests.get(url, headers=headers)
+
+            tmp = response.text
+            tmp = tmp.replace('null', 'None')
+            tmp = eval(tmp)
+            poster_url.append(p_url + tmp['posters'][0]['file_path'])
+
+
         col1, col2, col3, col4, col5 = st.columns(5)
         with col1:
-            st.image('https://image.tmdb.org/t/p/original//aljO2O1SP21GziM2Gc34jnSjac3.jpg')
+            st.image(poster_url[0])
             st.text(popular_result['title'])
         with col2:
-            st.image('https://image.tmdb.org/t/p/original//aljO2O1SP21GziM2Gc34jnSjac3.jpg')
+            st.image(poster_url[1])
             st.text(popular_result['title'])
         with col3:
-            st.image('https://image.tmdb.org/t/p/original//aljO2O1SP21GziM2Gc34jnSjac3.jpg')
+            st.image(poster_url[2])
             st.text(popular_result['title'])
         with col4:
-            st.image('https://image.tmdb.org/t/p/original//aljO2O1SP21GziM2Gc34jnSjac3.jpg')
+            st.image(poster_url[3])
             st.text(popular_result['title'])
         with col5:
-            st.image('https://image.tmdb.org/t/p/original//aljO2O1SP21GziM2Gc34jnSjac3.jpg')
+            st.image(poster_url[4])
             st.text(popular_result['title'])
 
     with tab2:
