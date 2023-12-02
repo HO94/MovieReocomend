@@ -9,7 +9,7 @@ import requests
 st.title('Movie Recommendation')
 st.text('국민대학교 인공지능응용 5조')
 
-pageNum= 1
+
 headers = {
     "accept": "application/json",
     "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIzZDE3M2UyMzlmNzEwNmNlNTA4M2I1MGI4ZjU1M2U0NiIsInN1YiI6IjY1Njg4YjAzMDljMjRjMDExYmU3MmFlNSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.a_uICMVt4DygQzVWT-nQeDwYYQQxvxDM2Ho0_oe7MdQ"
@@ -30,20 +30,20 @@ my_choice = st.selectbox('Please select a movie title', MOVIE_LIST)
 
 
 
-def cal_cosine_sim(df, sample=False):
+def cal_cosine_sim(response_df, sample=False):
     if sample == False:
         choice_df = movies[movies['title'] == my_choice][['id', 'title', 'overview']]
         choice_df.rename(columns = {'id' : 'movie_id'}, inplace=True)
-        df = pd.concat([df, choice_df], axis = 0).reset_index(drop=True)
+        response_df = pd.concat([response_df, choice_df], axis = 0).reset_index(drop=True)
     
     tfidf = TfidfVectorizer(stop_words='english')
-    df['overview'] = df['overview'].fillna('')
-    tfidf_matrix = tfidf.fit_transform(df['overview'])
+    response_df['overview'] = response_df['overview'].fillna('')
+    tfidf_matrix = tfidf.fit_transform(response_df['overview'])
     cosine_sim = linear_kernel(tfidf_matrix, tfidf_matrix)
-    indices = pd.Series(df.index, index=df['title']).drop_duplicates()
+    indices = pd.Series(response_df.index, index=response_df['title']).drop_duplicates()
     return indices, cosine_sim
 
-def get_recommendations(title, indices, cosine_sim):
+def get_recommendations(response_df,title, indices, cosine_sim):
     # Get the index of the movie that matches the title
     idx = indices[title]
     # Get the pairwsie similarity scores of all movies with that movie
@@ -55,44 +55,48 @@ def get_recommendations(title, indices, cosine_sim):
     # Get the movie indices
     movie_indices = [i[0] for i in sim_scores]
     # Return the top 10 most similar movies
-    return movies['title'].iloc[movie_indices]
+    return response_df['title'].iloc[movie_indices]
 
 
-def get_response(url, headers):
+def _get_response(url, headers):
     response = requests.get(url, headers=headers)
-    response_result = response.text
-    response_result = response_result.replace('false', 'False')
-    response_result = response_result.replace('null', 'None')
-    response_result = eval(response_result)
-    return response_result
+    response_dict = response.text
+    response_dict = response_dict.replace('false', 'False')
+    response_dict = response_dict.replace('null', 'None')
+    return eval(response_dict)
 
 
-def _get_response_df(response_result):
+def _get_df(response_dict):
     total_result = pd.DataFrame()
-    for idx in response_result['results']:
+    for idx in response_dict['results']:
         sub_result = pd.DataFrame({'movie_id' : [idx['id']],
-                                   'title' : [idx['title']],
+                                'title' : [idx['title']],
                                     'overview' : [idx['overview']]})
         total_result = pd.concat([total_result, sub_result], axis=0)
     return total_result
 
 
-def get_response_df(url, response_result):
-    response_df = _get_response_df(response_result)
+def get_response_df(url, target, headers):
+    response_dict = _get_response(url, headers)
     if 'popular' in url:
         # 1page : 20, total 1000
         end_point = 50
     else:
-        end_point = response_result['total_pages']+1
-    for pages in range(2, end_point):
-        pageNum = pages
-        response = requests.get(url, headers=headers)
-        response_result = response.text
-        response_result = response_result.replace('false', 'False')
-        response_result = response_result.replace('null', 'None')
-        response_result = eval(response_result)
-        response_df = pd.concat([response_df, _get_response_df(response_result)], axis=0)
-    return response_df.reset_index(drop=True)
+        end_point = response_dict['total_pages']+1
+    total_reulst = pd.DataFrame()
+    for pages in range(1, end_point):
+        
+        url_dict = {
+        # 'discover' : f'https://api.themoviedb.org/3/movie/now_playing?language=en-EN&page={pageNum}&region=KR',
+        'nowPlaying' : f'https://api.themoviedb.org/3/movie/now_playing?language=en-US&page={pages}&region=KR',
+        'popular' : f'https://api.themoviedb.org/3/movie/popular?language=en-US&page={pages}&region=KR',
+        'upComing' : f'https://api.themoviedb.org/3/movie/upcoming?language=en-US&page={pages}&region=KR'
+        }
+        response_dict = _get_response(url_dict[target], headers)
+        result = _get_df(response_dict)
+        total_reulst = pd.concat([total_reulst, result], axis=0)
+
+    return total_reulst.reset_index(drop=True)
 
 if st.button('Recommend') :
     # 탭 생성 : 첫번째 탭의 이름은 Tab A 로, Tab B로 표시합니다. 
@@ -100,22 +104,19 @@ if st.button('Recommend') :
 
     with tab1:
         popular_url = url_dict['popular']
-        response = get_response(popular_url, headers)
-        response_df = get_response_df(popular_url, response)
+        response_df = get_response_df(popular_url, 'popular', headers)
         indices, cosine_sim = cal_cosine_sim(response_df, sample=False)
         popular_result = get_recommendations(my_choice, indices, cosine_sim)
         st.text(popular_result)
     with tab2:
         now_url = url_dict['nowPlaying']
-        response = get_response(now_url, headers)
-        response_df = get_response_df(now_url, response)
+        response_df = get_response_df(now_url, 'nowPlaying', headers)
         indices, cosine_sim = cal_cosine_sim(response_df, sample=False)
         now_result = get_recommendations(my_choice, indices, cosine_sim)
         st.text(now_result)
     with tab3:
         come_url = url_dict['upComing']
-        response = get_response(come_url, headers)
-        response_df = get_response_df(come_url, response)
+        response_df = get_response_df(come_url, 'upComing', headers)
         indices, cosine_sim = cal_cosine_sim(response_df, sample=False)
         come_result = get_recommendations(my_choice, indices, cosine_sim)
         st.text(come_result)
