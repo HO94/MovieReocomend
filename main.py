@@ -43,6 +43,7 @@ def cal_cosine_sim(response_df, sample=False):
     indices = pd.Series(response_df.index, index=response_df['title']).drop_duplicates()
     return indices, cosine_sim
 
+
 def get_recommendations(response_df, title, indices, cosine_sim):
     # Get the index of the movie that matches the title
     idx = indices[title]
@@ -98,37 +99,41 @@ def get_response_df(url, target, headers):
 
     return total_reulst.reset_index(drop=True)
 
+
+def add_choice_movie(response_df_popular, movies):
+    response_df_popular = pd.concat([response_df_popular, movies[['id', 'title', 'overview']]], axis = 0)
+    return response_df_popular
+
+
+
 if st.button('Recommend') :
     # 탭 생성 : 첫번째 탭의 이름은 Tab A 로, Tab B로 표시합니다. 
     tab1, tab2, tab3, tab4= st.tabs(['Popular', 'Now Playing' , 'Upcoming', 'sample5000'])
 
     with tab1:
         popular_url = url_dict['popular']
-        
-        response_df = get_response_df(popular_url, 'popular', headers)
-        st.text(response_df)
-        indices, cosine_sim = cal_cosine_sim(response_df, sample=False)
-        st.text(indices)
-        st.text(cosine_sim)
-        popular_result = get_recommendations(response_df, my_choice, indices, cosine_sim)
+        response_df_popular = get_response_df(popular_url, 'popular', headers)
+        response_df_popular = add_choice_movie(response_df_popular, movies)
+        indices_popular, cosine_sim_popular = cal_cosine_sim(response_df_popular, sample=False)
+        popular_result = get_recommendations(response_df_popular, my_choice, indices_popular, cosine_sim_popular)
         st.text(popular_result)
     with tab2:
         now_url = url_dict['nowPlaying']
-        st.text(now_url)
-        response_df = get_response_df(now_url, 'nowPlaying', headers)
-        indices, cosine_sim = cal_cosine_sim(response_df, sample=False)
-        now_result = get_recommendations(response_df, my_choice, indices, cosine_sim)
+        response_df_nowPlaying = get_response_df(now_url, 'nowPlaying', headers)
+        response_df_nowPlaying = add_choice_movie(response_df_nowPlaying, movies)
+        indices_nowPlaying, cosine_sim_nowPlaying = cal_cosine_sim(response_df_nowPlaying, sample=False)
+        now_result = get_recommendations(response_df_nowPlaying, my_choice, indices_nowPlaying, cosine_sim_nowPlaying)
         st.text(now_result)
     with tab3:
         come_url = url_dict['upComing']
-        st.text(come_url)
-        response_df = get_response_df(come_url, 'upComing', headers)
-        indices, cosine_sim = cal_cosine_sim(response_df, sample=False)
-        come_result = get_recommendations(response_df, my_choice, indices, cosine_sim)
+        response_df_upComing = get_response_df(come_url, 'upComing', headers)
+        response_df_upComing = add_choice_movie(response_df_upComing, movies)
+        indices_upComing, cosine_simupComing = cal_cosine_sim(response_df_upComing, sample=False)
+        come_result = get_recommendations(response_df_upComing, my_choice, indices_upComing, cosine_simupComing)
         st.text(come_result)
     with tab4:
         indices, cosine_sim = cal_cosine_sim(movies, sample=True)
-        result = get_recommendations(response_df, my_choice, indices, cosine_sim)
+        result = get_recommendations(movies, my_choice, indices, cosine_sim)
         st.text(result)
 
 
