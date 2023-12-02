@@ -111,23 +111,23 @@ if st.button('Recommend') :
         response_df_popular = get_response_df(popular_url, 'popular', headers)
         indices_popular, cosine_sim_popular = cal_cosine_sim(response_df_popular, movies, my_choice)
         popular_result = get_recommendations(response_df_popular, my_choice, indices_popular, cosine_sim_popular)
-        st.text(popular_result)
+        st.text(popular_result['title'])
     with tab2:
         now_url = url_dict['nowPlaying']
         response_df_nowPlaying = get_response_df(now_url, 'nowPlaying', headers)
         indices_nowPlaying, cosine_sim_nowPlaying = cal_cosine_sim(response_df_nowPlaying, movies, my_choice)
         now_result = get_recommendations(response_df_nowPlaying, my_choice, indices_nowPlaying, cosine_sim_nowPlaying)
-        st.text(now_result)
+        st.text(now_result['title'])
     with tab3:
         come_url = url_dict['upComing']
         response_df_upComing = get_response_df(come_url, 'upComing', headers)
         indices_upComing, cosine_simupComing = cal_cosine_sim(response_df_upComing, movies, my_choice)
         come_result = get_recommendations(response_df_upComing, my_choice, indices_upComing, cosine_simupComing)
-        st.text(come_result)
+        st.text(come_result['title'])
     with tab4:
         indices, cosine_sim = cal_cosine_sim(movies, movies, my_choice, sample=True)
         result = get_recommendations(movies, my_choice, indices, cosine_sim)
-        st.text(result)
+        st.text(result['title'])
 
 
 values = st.slider('Please give me feedback', 0, 10, 5, 1 )
