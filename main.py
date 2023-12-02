@@ -111,8 +111,14 @@ if st.button('Recommend') :
         response_df_popular = get_response_df(popular_url, 'popular', headers)
         indices_popular, cosine_sim_popular = cal_cosine_sim(response_df_popular, movies, my_choice)
         popular_result = get_recommendations(response_df_popular, my_choice, indices_popular, cosine_sim_popular)
-        st.text(popular_result['title'])
-        st.image('https://image.tmdb.org/t/p/original//aljO2O1SP21GziM2Gc34jnSjac3.jpg')
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            st.text(popular_result['title'][0])
+            st.image('https://image.tmdb.org/t/p/original//aljO2O1SP21GziM2Gc34jnSjac3.jpg')
+        with col2:
+            st.text(popular_result['title'][1])
+            st.image('https://image.tmdb.org/t/p/original//aljO2O1SP21GziM2Gc34jnSjac3.jpg')
     with tab2:
         now_url = url_dict['nowPlaying']
         response_df_nowPlaying = get_response_df(now_url, 'nowPlaying', headers)
