@@ -70,7 +70,7 @@ def _get_df(response_dict):
     total_result = pd.DataFrame()
     for idx in response_dict['results']:
         sub_result = pd.DataFrame({'movie_id' : [idx['id']],
-                                'title' : [idx['title']],
+                                   'title' : [idx['title']],
                                     'overview' : [idx['overview']]})
         total_result = pd.concat([total_result, sub_result], axis=0)
     return total_result
