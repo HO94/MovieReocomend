@@ -30,8 +30,8 @@ my_choice = st.selectbox('Please select a movie title', MOVIE_LIST)
 
 
 
-def cal_cosine_sim(response_df, movies, my_choice, sample=False):
-    if sample == False:
+def cal_cosine_sim(response_df, movies, my_choice, sample=None):
+    if sample == None:
         if response_df[response_df['title'] == my_choice].shape[0] == 0:
             choice_df = movies[movies['title'] == my_choice][['id', 'title', 'overview']]
             choice_df.rename(columns = {'id' : 'movie_id'}, inplace=True)
