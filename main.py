@@ -14,12 +14,12 @@ headers = {
     "accept": "application/json",
     "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIzZDE3M2UyMzlmNzEwNmNlNTA4M2I1MGI4ZjU1M2U0NiIsInN1YiI6IjY1Njg4YjAzMDljMjRjMDExYmU3MmFlNSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.a_uICMVt4DygQzVWT-nQeDwYYQQxvxDM2Ho0_oe7MdQ"
 }
-pageNum = 1
+
 url_dict = {
     # 'discover' : f'https://api.themoviedb.org/3/movie/now_playing?language=en-EN&page={pageNum}&region=KR',
-    'nowPlaying' : f'https://api.themoviedb.org/3/movie/now_playing?language=en-US&page={pageNum}&region=KR',
-    'popular' : f'https://api.themoviedb.org/3/movie/popular?language=en-US&page={pageNum}&region=KR',
-    'upComing' : f'https://api.themoviedb.org/3/movie/upcoming?language=en-US&page={pageNum}&region=KR'
+    'nowPlaying' : f'https://api.themoviedb.org/3/movie/now_playing?language=en-US&page=1&region=KR',
+    'popular' : f'https://api.themoviedb.org/3/movie/popular?language=en-US&page=1&region=KR',
+    'upComing' : f'https://api.themoviedb.org/3/movie/upcoming?language=en-US&page=1&region=KR'
     }
 
 
@@ -86,13 +86,13 @@ def get_response_df(url, target, headers):
     total_reulst = pd.DataFrame()
     for pages in range(1, end_point):
         
-        url_dict = {
+        url_list = {
         # 'discover' : f'https://api.themoviedb.org/3/movie/now_playing?language=en-EN&page={pageNum}&region=KR',
         'nowPlaying' : f'https://api.themoviedb.org/3/movie/now_playing?language=en-US&page={pages}&region=KR',
         'popular' : f'https://api.themoviedb.org/3/movie/popular?language=en-US&page={pages}&region=KR',
         'upComing' : f'https://api.themoviedb.org/3/movie/upcoming?language=en-US&page={pages}&region=KR'
         }
-        response_dict = _get_response(url_dict[target], headers)
+        response_dict = _get_response(url_list[target], headers)
         result = _get_df(response_dict)
         total_reulst = pd.concat([total_reulst, result], axis=0)
 
@@ -104,18 +104,21 @@ if st.button('Recommend') :
 
     with tab1:
         popular_url = url_dict['popular']
+        st.text(popular_url)
         response_df = get_response_df(popular_url, 'popular', headers)
         indices, cosine_sim = cal_cosine_sim(response_df, sample=False)
         popular_result = get_recommendations(response_df, my_choice, indices, cosine_sim)
         st.text(popular_result)
     with tab2:
         now_url = url_dict['nowPlaying']
+        st.text(now_url)
         response_df = get_response_df(now_url, 'nowPlaying', headers)
         indices, cosine_sim = cal_cosine_sim(response_df, sample=False)
         now_result = get_recommendations(response_df, my_choice, indices, cosine_sim)
         st.text(now_result)
     with tab3:
         come_url = url_dict['upComing']
+        st.text(come_url)
         response_df = get_response_df(come_url, 'upComing', headers)
         indices, cosine_sim = cal_cosine_sim(response_df, sample=False)
         come_result = get_recommendations(response_df, my_choice, indices, cosine_sim)
