@@ -43,7 +43,7 @@ def cal_cosine_sim(response_df, sample=False):
     indices = pd.Series(response_df.index, index=response_df['title']).drop_duplicates()
     return indices, cosine_sim
 
-def get_recommendations(response_df,title, indices, cosine_sim):
+def get_recommendations(response_df, title, indices, cosine_sim):
     # Get the index of the movie that matches the title
     idx = indices[title]
     # Get the pairwsie similarity scores of all movies with that movie
@@ -106,23 +106,23 @@ if st.button('Recommend') :
         popular_url = url_dict['popular']
         response_df = get_response_df(popular_url, 'popular', headers)
         indices, cosine_sim = cal_cosine_sim(response_df, sample=False)
-        popular_result = get_recommendations(my_choice, indices, cosine_sim)
+        popular_result = get_recommendations(response_df, my_choice, indices, cosine_sim)
         st.text(popular_result)
     with tab2:
         now_url = url_dict['nowPlaying']
         response_df = get_response_df(now_url, 'nowPlaying', headers)
         indices, cosine_sim = cal_cosine_sim(response_df, sample=False)
-        now_result = get_recommendations(my_choice, indices, cosine_sim)
+        now_result = get_recommendations(response_df, my_choice, indices, cosine_sim)
         st.text(now_result)
     with tab3:
         come_url = url_dict['upComing']
         response_df = get_response_df(come_url, 'upComing', headers)
         indices, cosine_sim = cal_cosine_sim(response_df, sample=False)
-        come_result = get_recommendations(my_choice, indices, cosine_sim)
+        come_result = get_recommendations(response_df, my_choice, indices, cosine_sim)
         st.text(come_result)
     with tab4:
         indices, cosine_sim = cal_cosine_sim(movies, sample=True)
-        result = get_recommendations(my_choice, indices, cosine_sim)
+        result = get_recommendations(response_df, my_choice, indices, cosine_sim)
         st.text(result)
 
 
